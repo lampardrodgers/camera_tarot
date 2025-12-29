@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>神秘塔罗牌 - 手势控制3D卡牌</title>
+    <meta name="description" content="通过手势控制的3D塔罗牌占卜体验">
+
+    <!-- Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Noto+Serif+SC:wght@400;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <!-- GSAP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+    <!-- MediaPipe Hands -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+    <!-- 3D Canvas Container -->
+    <div id="canvas-container"></div>
+
+    <!-- Camera Preview -->
+    <div id="camera-container">
+        <video id="camera-feed" autoplay playsinline></video>
+        <canvas id="camera-canvas"></canvas>
+        <div id="camera-status">
+            <span class="status-dot"></span>
+            <span id="status-text">正在初始化摄像头...</span>
+        </div>
+    </div>
+
+    <!-- Gesture Hint Panel -->
+    <div id="gesture-panel">
+        <h3>手势指南</h3>
+        <div class="gesture-item" id="hint-spread">
+            <span class="gesture-icon">🖐️</span>
+            <span class="gesture-text">张开手掌 - 展开卡牌</span>
+        </div>
+        <div class="gesture-item" id="hint-collapse">
+            <span class="gesture-icon">✊</span>
+            <span class="gesture-text">握拳收手 - 收起卡牌</span>
+        </div>
+        <div class="gesture-item" id="hint-select">
+            <span class="gesture-icon">👈👉</span>
+            <span class="gesture-text">左右滑动 - 选择卡牌</span>
+        </div>
+        <div class="gesture-item" id="hint-grab">
+            <span class="gesture-icon">☝️</span>
+            <span class="gesture-text">竖食指 - 抽取卡牌</span>
+        </div>
+        <div class="gesture-item" id="hint-ok">
+            <span class="gesture-icon">👌</span>
+            <span class="gesture-text">OK手势 - 查看解读</span>
+        </div>
+    </div>
+
+    <!-- Current State Indicator -->
+    <div id="state-indicator">
+        <div id="state-icon">🎴</div>
+        <div id="state-text">准备就绪</div>
+    </div>
+
+    <!-- Card Info Panel (shown after card is drawn) -->
+    <div id="card-info-panel" class="hidden">
+        <button id="close-info" class="close-btn">&times;</button>
+        <div class="card-info-header">
+            <div class="card-info-kicker">神谕降临</div>
+            <div class="card-info-subtitle">ARCANA REVELATION</div>
+        </div>
+        <div class="card-info-divider"></div>
+        <div id="card-image" class="card-image-frame"></div>
+        <h2 id="card-name">卡牌名称</h2>
+        <p id="card-meaning">卡牌含义</p>
+        <button id="continue-btn" class="primary-btn">继续占卜</button>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay">
+        <div class="loader">
+            <div class="tarot-spinner"></div>
+            <p>正在加载神秘塔罗...</p>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script type="module" src="js/app.js"></script>
+</body>
+
+</html>

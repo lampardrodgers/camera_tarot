@@ -1,0 +1,557 @@
+/* ============================================
+   3D塔罗牌 - 神秘风格样式表
+   ============================================ */
+
+:root {
+    /* 神秘紫金配色 */
+    --primary-purple: #6B4AA0;
+    --deep-purple: #2D1B4E;
+    --accent-gold: #D4AF37;
+    --accent-gold-light: #F4D03F;
+    --mystic-blue: #1A1A3E;
+    --dark-bg: #0A0A15;
+    --text-light: #E8E8F0;
+    --text-muted: #9090A0;
+    
+    /* 渐变 */
+    --gradient-mystic: linear-gradient(135deg, #1A1A3E 0%, #2D1B4E 50%, #0A0A15 100%);
+    --gradient-gold: linear-gradient(135deg, #D4AF37 0%, #F4D03F 50%, #D4AF37 100%);
+    --gradient-card: linear-gradient(180deg, rgba(107, 74, 160, 0.3) 0%, rgba(26, 26, 62, 0.8) 100%);
+    
+    /* 阴影 */
+    --shadow-glow: 0 0 30px rgba(212, 175, 55, 0.3);
+    --shadow-card: 0 10px 40px rgba(0, 0, 0, 0.5);
+    
+    /* 字体 */
+    --font-display: 'Cinzel', 'Noto Serif SC', serif;
+    --font-body: 'Noto Serif SC', serif;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-body);
+    background: var(--dark-bg);
+    color: var(--text-light);
+    overflow: hidden;
+    min-height: 100vh;
+}
+
+/* ============================================
+   3D Canvas 容器
+   ============================================ */
+#canvas-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 1;
+    background: var(--gradient-mystic);
+}
+
+#canvas-container canvas {
+    display: block;
+}
+
+/* ============================================
+   摄像头预览窗口
+   ============================================ */
+#camera-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 240px;
+    height: 180px;
+    border-radius: 16px;
+    overflow: hidden;
+    z-index: 100;
+    border: 2px solid var(--accent-gold);
+    box-shadow: var(--shadow-glow);
+    background: rgba(0, 0, 0, 0.8);
+}
+
+#camera-feed,
+#camera-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scaleX(-1); /* 镜像翻转 */
+}
+
+#camera-canvas {
+    z-index: 2;
+}
+
+#camera-status {
+    position: absolute;
+    bottom: 8px;
+    left: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    background: rgba(0, 0, 0, 0.7);
+    border-radius: 20px;
+    font-size: 12px;
+    z-index: 3;
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #ff4444;
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+.status-dot.active {
+    background: #44ff44;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* ============================================
+   手势提示面板
+   ============================================ */
+#gesture-panel {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    padding: 20px;
+    background: rgba(26, 26, 62, 0.9);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    border-radius: 16px;
+    backdrop-filter: blur(10px);
+    z-index: 100;
+    min-width: 220px;
+}
+
+#gesture-panel h3 {
+    font-family: var(--font-display);
+    color: var(--accent-gold);
+    margin-bottom: 15px;
+    font-size: 16px;
+    text-align: center;
+    letter-spacing: 2px;
+}
+
+.gesture-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    margin-bottom: 8px;
+    background: rgba(107, 74, 160, 0.2);
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    border: 1px solid transparent;
+}
+
+.gesture-item:last-child {
+    margin-bottom: 0;
+}
+
+.gesture-item.active {
+    background: rgba(212, 175, 55, 0.2);
+    border-color: var(--accent-gold);
+    transform: translateX(5px);
+}
+
+.gesture-icon {
+    font-size: 20px;
+    min-width: 40px;
+    text-align: center;
+}
+
+.gesture-text {
+    font-size: 13px;
+    color: var(--text-muted);
+}
+
+.gesture-item.active .gesture-text {
+    color: var(--text-light);
+}
+
+/* ============================================
+   状态指示器
+   ============================================ */
+#state-indicator {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    z-index: 50;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+#state-indicator.visible {
+    opacity: 1;
+}
+
+#state-icon {
+    font-size: 60px;
+    margin-bottom: 15px;
+    filter: drop-shadow(0 0 20px rgba(212, 175, 55, 0.5));
+    animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+#state-text {
+    font-family: var(--font-display);
+    font-size: 24px;
+    color: var(--accent-gold);
+    text-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+    letter-spacing: 3px;
+}
+
+/* ============================================
+   卡牌信息面板
+   ============================================ */
+#card-info-panel {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.9);
+    width: 90%;
+    max-width: 500px;
+    padding: 40px;
+    background: radial-gradient(140% 120% at 50% 0%, rgba(212, 175, 55, 0.22) 0%, rgba(107, 74, 160, 0.38) 40%, rgba(26, 26, 62, 0.92) 100%);
+    border: 1px solid rgba(212, 175, 55, 0.7);
+    border-radius: 24px;
+    backdrop-filter: blur(20px);
+    z-index: 200;
+    text-align: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6), 0 0 60px rgba(212, 175, 55, 0.2);
+    overflow: hidden;
+}
+
+#card-info-panel::before {
+    content: "";
+    position: absolute;
+    inset: 12px;
+    border: 1px solid rgba(212, 175, 55, 0.35);
+    border-radius: 18px;
+    pointer-events: none;
+}
+
+#card-info-panel::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(circle at 20% 15%, rgba(244, 208, 63, 0.18), transparent 45%),
+        radial-gradient(circle at 80% 10%, rgba(212, 175, 55, 0.2), transparent 40%),
+        radial-gradient(circle at 50% 85%, rgba(107, 74, 160, 0.35), transparent 55%),
+        repeating-radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.03) 0, rgba(255, 255, 255, 0.03) 2px, transparent 2px, transparent 6px);
+    mix-blend-mode: screen;
+    opacity: 0.7;
+    pointer-events: none;
+    animation: panelGlow 6s ease-in-out infinite;
+}
+
+#card-info-panel.visible {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+    pointer-events: auto;
+}
+
+#card-info-panel.hidden {
+    display: none;
+}
+
+.close-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    width: 36px;
+    height: 36px;
+    border: none;
+    background: rgba(26, 26, 62, 0.65);
+    border: 1px solid rgba(212, 175, 55, 0.35);
+    color: var(--text-light);
+    font-size: 24px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 2;
+}
+
+.close-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: rotate(90deg);
+}
+
+#card-image {
+    width: 190px;
+    height: 300px;
+    margin: 10px auto 22px;
+    background: var(--gradient-gold);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    border-radius: 12px;
+    box-shadow: var(--shadow-glow);
+}
+
+.card-image-frame {
+    position: relative;
+    border: 1px solid rgba(212, 175, 55, 0.6);
+    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.45), 0 0 25px rgba(212, 175, 55, 0.3);
+}
+
+.card-image-frame::before {
+    content: "";
+    position: absolute;
+    inset: -22px;
+    border-radius: 24px;
+    background:
+        conic-gradient(from 0deg, rgba(212, 175, 55, 0.0), rgba(212, 175, 55, 0.35), rgba(212, 175, 55, 0.0) 45%, rgba(244, 208, 63, 0.4) 55%, rgba(212, 175, 55, 0.0)),
+        radial-gradient(circle, rgba(244, 208, 63, 0.2), transparent 60%);
+    filter: blur(6px);
+    opacity: 0.8;
+    pointer-events: none;
+    animation: rotateHalo 10s linear infinite;
+}
+
+.card-image-frame::after {
+    content: "";
+    position: absolute;
+    inset: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 8px;
+    pointer-events: none;
+}
+
+.card-info-header {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    align-items: center;
+    margin-bottom: 18px;
+}
+
+.card-info-kicker {
+    font-family: var(--font-display);
+    font-size: 14px;
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    color: rgba(244, 208, 63, 0.85);
+}
+
+.card-info-subtitle {
+    font-size: 12px;
+    letter-spacing: 4px;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.card-info-divider {
+    height: 1px;
+    width: 70%;
+    margin: 0 auto 18px;
+    background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.8), transparent);
+}
+
+#card-name {
+    font-family: var(--font-display);
+    font-size: 28px;
+    color: transparent;
+    background: linear-gradient(120deg, #f8e28a 0%, #d4af37 40%, #fff1b0 70%, #d4af37 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    margin-bottom: 15px;
+    letter-spacing: 2px;
+    text-shadow: 0 6px 18px rgba(212, 175, 55, 0.35);
+}
+
+#card-meaning {
+    font-size: 16px;
+    color: var(--text-muted);
+    line-height: 1.8;
+    margin-bottom: 30px;
+}
+
+.primary-btn {
+    padding: 15px 40px;
+    background: var(--gradient-gold);
+    border: none;
+    border-radius: 30px;
+    font-family: var(--font-display);
+    font-size: 16px;
+    color: var(--deep-purple);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-glow);
+}
+
+.primary-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 40px rgba(212, 175, 55, 0.5);
+}
+
+@keyframes panelGlow {
+    0%, 100% { opacity: 0.55; }
+    50% { opacity: 0.85; }
+}
+
+@keyframes rotateHalo {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* ============================================
+   加载动画
+   ============================================ */
+#loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: var(--dark-bg);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    transition: opacity 0.5s ease;
+}
+
+#loading-overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.loader {
+    text-align: center;
+}
+
+.tarot-spinner {
+    width: 80px;
+    height: 120px;
+    margin: 0 auto 30px;
+    background: var(--gradient-gold);
+    border-radius: 8px;
+    animation: cardSpin 2s ease-in-out infinite;
+    box-shadow: var(--shadow-glow);
+}
+
+@keyframes cardSpin {
+    0%, 100% { 
+        transform: rotateY(0deg) rotateZ(0deg); 
+    }
+    25% {
+        transform: rotateY(180deg) rotateZ(5deg);
+    }
+    50% { 
+        transform: rotateY(360deg) rotateZ(0deg); 
+    }
+    75% {
+        transform: rotateY(540deg) rotateZ(-5deg);
+    }
+}
+
+.loader p {
+    font-family: var(--font-display);
+    color: var(--accent-gold);
+    font-size: 18px;
+    letter-spacing: 3px;
+    animation: fadeInOut 2s ease-in-out infinite;
+}
+
+@keyframes fadeInOut {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+}
+
+/* ============================================
+   粒子效果容器
+   ============================================ */
+#particle-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 60;
+}
+
+.particle {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: var(--accent-gold);
+    border-radius: 50%;
+    pointer-events: none;
+    box-shadow: 0 0 10px var(--accent-gold);
+}
+
+/* ============================================
+   响应式调整
+   ============================================ */
+@media (max-width: 768px) {
+    #camera-container {
+        width: 160px;
+        height: 120px;
+        bottom: 10px;
+        right: 10px;
+    }
+    
+    #gesture-panel {
+        top: auto;
+        bottom: 140px;
+        left: 10px;
+        right: 10px;
+        padding: 15px;
+    }
+    
+    #gesture-panel h3 {
+        font-size: 14px;
+    }
+    
+    .gesture-item {
+        padding: 8px 10px;
+    }
+    
+    .gesture-icon {
+        font-size: 16px;
+        min-width: 30px;
+    }
+    
+    .gesture-text {
+        font-size: 11px;
+    }
+    
+    #card-info-panel {
+        padding: 25px;
+    }
+
+    .card-info-kicker {
+        letter-spacing: 4px;
+        font-size: 12px;
+    }
+    
+    #card-name {
+        font-size: 22px;
+    }
+}
